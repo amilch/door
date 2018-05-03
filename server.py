@@ -34,10 +34,15 @@ def start(bot, update):
     To get access your Telegram ID has to be whitelisted.
     You can get your ID by contacting @myidbot.""")
 
+def status(bot, update):
+  bot.send_message(chat_id=update.message.chat_id, text="Still alive.")
+
 def main():
   try:
     dispatcher.add_handler(
       CommandHandler("start", start))
+    dispatcher.add_handler(
+      CommandHandler("status", status))
     dispatcher.add_handler(
       CommandHandler("open", open, Filters.chat(config.allowed_chat_ids)))
 
