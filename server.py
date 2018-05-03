@@ -1,29 +1,29 @@
 #!/usr/bin/env python3
 
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from flask import Flask
 import RPi.GPIO as GPIO
 import time
 
+app = Flask(__name__)
+
 pin = 17
 
-class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
+@app.route("/")
+def open():
+  GPIO.output(pin, GPIO.HIGH)
+  time.sleep(4)
+  GPIO.output(pin, GPIO.LOW)
+  return "welcome"
 
-    def do_GET(self):
-        self.send_response(200)
-        self.end_headers()
-        self.wfile.write(b'Welcome!')
-        GPIO.output(pin, GPIO.HIGH)
-        time.sleep(4)
-        GPIO.output(pin, GPIO.LOW)
+def main():
+  try:
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(pin, GPIO.OUT)
+    GPIO.output(pin, GPIO.LOW)
 
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(pin, GPIO.OUT)
-GPIO.output(pin, GPIO.LOW)
+    app.run(host="0.0.0.0", port=1312)
+  finally:
+    GPIO.cleanup()
 
-httpd = HTTPServer(('', 1312), SimpleHTTPRequestHandler)
-
-try:
-  httpd.serve_forever()
-finally:
-  GPIO.cleanup()
-
+if __name__ == "__main__":
+  main()
