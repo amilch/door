@@ -2,6 +2,7 @@
 
 from telegram.ext import Updater
 from telegram.ext import CommandHandler
+from telegram.ext import Filters
 
 import RPi.GPIO as GPIO
 import time
@@ -28,14 +29,17 @@ def open(bot, update):
 
 def start(bot, update):
   bot.send_message(chat_id=update.message.chat_id,
-    text="Hi!\nTo open the door say /open.")
+    text="""Hi!
+    To open the door say /open.
+    To get access your Telegram ID has to be whitelisted.
+    You can get your ID by contacting @myidbot.""")
 
 def main():
   try:
     dispatcher.add_handler(
       CommandHandler("start", start))
     dispatcher.add_handler(
-      CommandHandler("open", open))
+      CommandHandler("open", open, Filters.chat(config.allowed_chat_ids)))
 
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(pin, GPIO.OUT)
