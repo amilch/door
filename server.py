@@ -1,27 +1,48 @@
 #!/usr/bin/env python3
 
-from flask import Flask
+from telegram.ext import Updater
+from telegram.ext import CommandHandler
+
 import RPi.GPIO as GPIO
 import time
-
-app = Flask(__name__)
+import config
+import logging
 
 pin = 17
 
-@app.route("/")
-def open():
+updater = Updater(config.api_token)
+dispatcher = updater.dispatcher
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+  level=logging.INFO)
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(pin, GPIO.OUT)
+GPIO.output(pin, GPIO.LOW)
+
+
+def open(bot, update):
   GPIO.output(pin, GPIO.HIGH)
   time.sleep(4)
   GPIO.output(pin, GPIO.LOW)
-  return "welcome"
+  bot.send_message(chat_id=update.message.chat_id, text="Welcome!")
+
+def start(bot, update):
+  bot.send_message(chat_id=update.message.chat_id,
+    text="Hi!\nTo open the door say /open.")
 
 def main():
   try:
+    dispatcher.add_handler(
+      CommandHandler("start", start))
+    dispatcher.add_handler(
+      CommandHandler("open", open))
+
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(pin, GPIO.OUT)
     GPIO.output(pin, GPIO.LOW)
 
-    app.run(host="0.0.0.0", port=1312)
+    updater.start_polling()
+    updater.idle()
   finally:
     GPIO.cleanup()
 

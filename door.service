@@ -1,0 +1,10 @@
+[Unit]
+Description=Door opener
+
+[Service]
+ExecStart=/home/pi/door/server.py
+Restart = always
+RestartSec = 5s
+
+[Install]
+WantedBy=default.target
