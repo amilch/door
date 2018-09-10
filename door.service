@@ -3,6 +3,8 @@ Description=Door opener
 
 [Service]
 ExecStart=/home/pi/door/server.py
+User=pi
+Group=pi
 Restart = always
 RestartSec = 5s
 
